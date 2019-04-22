@@ -1,6 +1,8 @@
 ![Virtual Filmback, an in-editor VR directing tool](images/header.png)
 
-This Unity package allows you to instance yourself into your Unity scene and record camera movements in a more precise, true-to-life fashion. Convenient for high end real-time rendering and game cutscenes alike - No more intermittent mashing of *GameObject/Align With View* to key camera position. As this package contains only the camera prefab and not a full-locomotion system (for now), this package can also be installed on top of any project with pre-installed VR integration (so that you can devise your own long range movement schemes, whether it be Cloverfield-esque foot movement or dolly translations).
+This Unity package allows you to instance yourself into your Unity scene and record camera movements in a more precise, true-to-life fashion. Convenient for high end real-time rendering and game cutscenes alike - No more intermittent mashing of *GameObject/Align With View* to key camera position.
+
+As this package contains only the camera prefab and not a full-locomotion system (for now), this package can also be installed on top of any project with pre-installed VR integration (so that you can devise your own long range movement schemes, whether it be Cloverfield-esque foot movement or dolly translations).
 
 ### Control Scheme
 Controls are one-handed and mirrored, ultimately you can only hold one controller if you wish to do so but you can still hold the camera with one hand and control playback and recording with the other.
