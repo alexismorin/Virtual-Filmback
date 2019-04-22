@@ -1,0 +1,12 @@
+{
+    "name": "com.alexismorin.virtualfilmback",
+    "displayName": "Virtual Filmback",
+    "version": "1.0.0",
+    "unity": "2019.2",
+    "description": "Direct & record complex camera motions in VR.",
+    "keywords": [
+        "camera",
+        "sequencing"
+    ],
+    "category": "Open-Source"
+}
