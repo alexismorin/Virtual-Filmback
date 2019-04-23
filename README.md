@@ -41,6 +41,6 @@ This is a plugin that makes use of Unity's new *Package Manager* feature. Just d
 - Flying movement scheme to increase possible recording range.
 - Better compatibility with non-Oculus headsets.
 
-Try and enjot in spite of all the bugs!
+Try and enjoy in spite of all the bugs!
 
 Crafted at [Imaginary Spaces](https://imaginary-spaces.com/) while waiting for other packages to import.
