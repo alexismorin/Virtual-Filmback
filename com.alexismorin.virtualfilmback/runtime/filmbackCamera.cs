@@ -5,9 +5,12 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.XR;
 
-public class filmbackCamera : MonoBehaviour {
-    [Header ("Camera Settings")]
+public class filmbackCamera : MonoBehaviour
+{
+    [Header("Camera Settings")]
 
+    [SerializeField]
+    Transform cameraOperator;
     [SerializeField]
     PlayableDirector associatedPlayableDirector;
     [SerializeField]
@@ -15,7 +18,7 @@ public class filmbackCamera : MonoBehaviour {
     [SerializeField]
     bool leftHanded;
 
-    [Header ("Core Components")]
+    [Header("Core Components")]
     [SerializeField]
     Camera cameraComponent;
     [SerializeField]
@@ -30,54 +33,181 @@ public class filmbackCamera : MonoBehaviour {
     Material timelineBulb;
     GameObject mainCamera;
 
-    void Start () {
-        filmbackSetup ();
+    float triggerPress;
+    bool lastIsRecording;
+    bool isRecording;
+    bool lastIsPlayingSequence;
+    bool isPlayingSequence;
+
+    bool canRecord = false;
+
+    RecorderController filmbackRecorder;
+    RecorderControllerSettings filmbackRecorderSettings;
+
+    AnimationRecorderSettings cameraMovementRecorderSettings;
+
+    void Start()
+    {
+        VRSafetyCheck();
+        filmbackSetup();
     }
 
-    void VRSafetyCheck () {
+    void VRSafetyCheck()
+    {
+        XRDevice.SetTrackingSpaceType(TrackingSpaceType.RoomScale);
+    }
+
+    void SetupNewRecorder()
+    {
+        // creating animation recorder and assigning the camera to it
+        cameraMovementRecorderSettings = ScriptableObject.CreateInstance("AnimationRecorderSettings") as AnimationRecorderSettings;
+        cameraMovementRecorderSettings.animationInputSettings.recursive = false;
+        cameraMovementRecorderSettings.animationInputSettings.gameObject = this.gameObject;
+        cameraMovementRecorderSettings.animationInputSettings.AddComponentToRecord(typeof(Transform));
+        cameraMovementRecorderSettings.animationInputSettings.AddComponentToRecord(typeof(Camera));
+
+
+        // creating recorder settings and assigning our animation recorder settings to it
+        filmbackRecorderSettings = ScriptableObject.CreateInstance("RecorderControllerSettings") as RecorderControllerSettings;
+        filmbackRecorderSettings.AddRecorderSettings(cameraMovementRecorderSettings);
+        filmbackRecorderSettings.SetRecordModeToManual();
+
+        // creating a new recorder instance with the correct settings
+        filmbackRecorder = new RecorderController(filmbackRecorderSettings);
 
     }
 
-    void filmbackSetup () {
+    void filmbackSetup()
+    {
+
         mainCamera = Camera.main.gameObject;
         cameraComponent.fieldOfView = defaultFOV;
-        recordingBulb = cameraGameObject.GetComponent<MeshRenderer> ().materials[2];
-        timelineBulb = cameraGameObject.GetComponent<MeshRenderer> ().materials[1];
-        recordingBulb.SetColor ("_EmissionColor", Color.black);
-        timelineBulb.SetColor ("_EmissionColor", Color.black);
+        recordingBulb = cameraGameObject.GetComponent<MeshRenderer>().materials[2];
+        timelineBulb = cameraGameObject.GetComponent<MeshRenderer>().materials[1];
+        recordingBulb.SetColor("_EmissionColor", Color.black);
+        timelineBulb.SetColor("_EmissionColor", Color.black);
 
-        if (leftHanded == false) {
+        if (leftHanded == false)
+        {
             viewport.transform.parent = rightHandRoot;
             viewport.transform.localPosition = Vector3.zero;
         }
 
-        VRSafetyCheck ();
+        canRecord = true;
     }
 
-    void Update () {
+    void Update()
+    {
+        lastIsRecording = isRecording;
+        lastIsPlayingSequence = isPlayingSequence;
 
-        Vector3 viewportTargetLookat = new Vector3 (viewport.transform.localPosition.x, mainCamera.transform.position.y, mainCamera.transform.position.z);
-        viewport.transform.LookAt (viewportTargetLookat);
 
-        Vector3 newFocusRotation = new Vector3 (0f, 0f, cameraComponent.fieldOfView);
+        List<XRNodeState> xrNodes = new List<XRNodeState>();
+        InputTracking.GetNodeStates(xrNodes);
+
+        for (int i = 0; i < xrNodes.Count; i++)
+        {
+
+            if (leftHanded)
+            {
+                if (xrNodes[i].nodeType == XRNode.LeftHand)
+                {
+                    Vector3 newHandPosition;
+                    xrNodes[i].TryGetPosition(out newHandPosition);
+                    transform.localPosition = newHandPosition;
+
+                    Quaternion newHandRotation;
+                    xrNodes[i].TryGetRotation(out newHandRotation);
+                    transform.localRotation = newHandRotation;
+
+                    InputDevices.GetDeviceAtXRNode(xrNodes[i].nodeType).TryGetFeatureValue(CommonUsages.trigger, out triggerPress);
+                    InputDevices.GetDeviceAtXRNode(xrNodes[i].nodeType).TryGetFeatureValue(CommonUsages.gripButton, out isPlayingSequence);
+
+                    if (triggerPress > 0.6f)
+                    {
+                        isRecording = true;
+                    }
+                    else
+                    {
+                        isRecording = false;
+                    }
+
+                }
+
+            }
+            else
+            {
+
+            }
+
+        }
+
+        if (canRecord)
+        {
+            if (isRecording == true && lastIsRecording == false)
+            {
+                startRecording();
+            }
+            if (lastIsRecording == true && isRecording == false)
+            {
+                stopRecording();
+            }
+            if (isPlayingSequence == true && lastIsPlayingSequence == false)
+            {
+                startTimelinePlayback();
+            }
+            if (lastIsPlayingSequence == true && isPlayingSequence == false)
+            {
+                stopTimelinePlayback();
+            }
+        }
+
+        Vector3 newFocusRotation = new Vector3(0f, 0f, cameraComponent.fieldOfView);
         fovWheel.transform.localEulerAngles = newFocusRotation;
+
+
+
     }
 
-    void startRecording () {
-        recordingBulb.SetColor ("_EmissionColor", Color.red);
+    void startRecording()
+    {
+
+        SetupNewRecorder();
+
+        if (filmbackRecorder.IsRecording() == false)
+        {
+            recordingBulb.SetColor("_EmissionColor", Color.red);
+            filmbackRecorder.StartRecording();
+        }
+
     }
 
-    void stopRecording () {
-        recordingBulb.SetColor ("_EmissionColor", Color.black);
+    void stopRecording()
+    {
+        if (filmbackRecorder.IsRecording() == true)
+        {
+            filmbackRecorder.StopRecording();
+            recordingBulb.SetColor("_EmissionColor", Color.black);
+
+        }
     }
 
-    void startTimelinePlayback () {
-        timelineBulb.SetColor ("_EmissionColor", Color.green);
-        associatedPlayableDirector.Play ();
+    void startTimelinePlayback()
+    {
+        timelineBulb.SetColor("_EmissionColor", Color.green);
+        if (associatedPlayableDirector != null)
+        {
+            associatedPlayableDirector.Play();
+        }
+
     }
 
-    void stopTimelinePlayback () {
-        timelineBulb.SetColor ("_EmissionColor", Color.black);
-        associatedPlayableDirector.Pause ();
+    void stopTimelinePlayback()
+    {
+        timelineBulb.SetColor("_EmissionColor", Color.black);
+        if (associatedPlayableDirector != null)
+        {
+            associatedPlayableDirector.Pause();
+        }
     }
 }
