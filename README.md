@@ -5,11 +5,8 @@ This Unity package allows you to instance yourself into your Unity scene and rec
 As this package contains only the camera prefab and not a full-locomotion system (for now), this package can also be installed on top of any project with pre-installed VR integration (so that you can devise your own long range movement schemes, whether it be Cloverfield-esque foot movement or dolly translations).
 
 ### Control Scheme
-Controls are one-handed and mirrored, ultimately you can only hold one controller if you wish to do so but you can still hold the camera with one hand and control playback and recording with the other.
-
-#### Oculus Touch
-- Index trigger button: Hold to record.
-- B / Y buttons: Play & pause current timeline.
+- Trigger button: Hold to record.
+- Grip button: Play & pause the current timeline.
 - A / X buttons: Snap back to original FOV.
 - Joystick, horizontally: Zoom in and out.
 
