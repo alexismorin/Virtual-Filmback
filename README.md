@@ -14,7 +14,7 @@ This package contains only a camera prefab and not a full-locomotion system (for
 
 - If you are left-handed, mark the checkbox as such - this will adjust the position of the camera viewport for you (yes, I only made this because I'm left handed myself).
 - Assign a playable director in your scene to the playable director slot - you'll be able to pause and play your Timeline to give yourself some time to reposition yourself between shots.
-- Set the inital field of view for your camera (50-55 is a good setting for film 7 TV but you can increase it higher if you're recording cutscenes for a skateboard game) - In a future version I plan of having a button to easily snap back to this preset FOV.
+- Set the inital field of view for your camera (50-55 is a good setting for film & TV but you can increase it higher if you're recording cutscenes for a skateboard game) - In a future version I plan of having a button to easily snap back to this preset FOV.
 
 ![gif](images/gif.gif)
 
