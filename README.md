@@ -38,4 +38,4 @@ This is a plugin that makes use of Unity's new *Package Manager* feature. Just d
 
 Per usual, try and enjoy in spite of all the bugs!
 
-(Monstly) crafted in a few hours at [Imaginary Spaces](https://imaginary-spaces.com/) while waiting for other packages to import.
+(Mostly) crafted in a few hours at [Imaginary Spaces](https://imaginary-spaces.com/) while waiting for other packages to import.
